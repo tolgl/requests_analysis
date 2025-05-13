@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 
 def yandex_search(query):
-    brand_name = ''
+    yandex_h1 = ''
     url = 'https://www.yandex.ru/yandsearch'
 
     headers = {
@@ -32,9 +32,6 @@ def yandex_search(query):
     time.sleep(1.5)
     soup = BeautifulSoup(response.text, 'html.parser')
     for result in soup.find_all("h1"):
-        brand_name = result.get_text()
-    # print(soup)
-    return brand_name
+        yandex_h1 = result.get_text()
 
-
-print(yandex_search(query='Прямой сгон американка Valtec VTr.341.N.0005'))
+    return yandex_h1
