@@ -18,9 +18,7 @@ def google_search(query):
     info_products = []
     name_products = []
     response = requests.get(url, params=params)
-    print(response.json())
-    print(params['key'])
-    print(params['cx'])
+
     if 'items' in response.json():
         for i in response.json()['items']:
             if 'pagemap' in i:
@@ -33,6 +31,3 @@ def google_search(query):
                 name_products.append(info_product[0]['name'])
 
     return name_products[0:1]
-
-
-print(google_search(query='дрель makita'))
