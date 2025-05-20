@@ -1,6 +1,7 @@
 import pandas
 from ya_search import yandex_search
 from itertools import chain
+import re
 # import nltk
 # from nltk.tokenize import word_tokenize
 # from nltk.corpus import stopwords
@@ -30,15 +31,18 @@ def requests_analysis():
     list_list_words = []
     list_list_words_without_characters = []
     list_products = []
+    list_requests_without_camelcase = []
     data = pandas.read_excel("2025-04-28 Запросы B2B — копия.xlsx", engine='openpyxl')
     df = pandas.DataFrame(data)
 
     for row in df.itertuples():
         requests_list.append(row[1])
 
+    # разбиваем CamelCase слова и разбиваем весь поисковой запрос на слова
     for i in requests_list:
-        list_list_words.append(str(i).lower().split())
+        list_list_words.append((re.sub(r'([a-z])([A-Z])', r'\1 \2', i)).split())
 
+    # удаляем символы в словах
     for list_words in list_list_words:
         for word in list_words:
             if any(s in word for s in chars):
@@ -48,16 +52,19 @@ def requests_analysis():
                 list_words.remove(bad_word)
         list_list_words_without_characters.append(list_words)
 
+    # объединяем слова в списке
     list_requests_without_characters = [[' '.join(n)] for n in list_list_words_without_characters]
     list_requests_without_doubles = list(set(chain.from_iterable(list_requests_without_characters)))
     print(list_requests_without_doubles)
 
+    # подключаем функцию отправки запроса в поиск яндекса
     for product in list_requests_without_doubles:
         if len(yandex_search(query=product)) != 0 or yandex_search(query=product) != '':
             list_products.append(yandex_search(query=product))
         else:
             list_products.append(product)
-    print(list_products)
+
+    # записываем результат в файл
     with open('result.txt', 'w', encoding='utf-8') as file:
         for request in list_products:
             file.write(f'{str(request)}\n')
